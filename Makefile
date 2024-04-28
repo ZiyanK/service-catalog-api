@@ -1,8 +1,11 @@
-FILE=./database/data_model.sql
-DATAMODEL=`cat $(FILE)`
+DBUSER=root
+DBPASSWORD=password
+DBPORT=5432
+DBNAME=service_catalog
+DSN=postgresql://$(DBUSER):$(DBPASSWORD)@localhost:$(DBPORT)/$(DBNAME)?sslmode=disable
 
 db-up:
-	docker run --name postgres -e POSTGRES_USER=root -e POSTGRES_PASSWORD=password -p 5432:5432 -d postgres
+	docker run --name postgres -e POSTGRES_USER=$(DBUSER) -e POSTGRES_PASSWORD=$(DBPASSWORD) -p $(DBPORT):$(DBPORT) -d postgres
 
 db-down:
 	@if docker ps -a --format '{{.Names}}' | grep -q '^postgres$$'; then \
@@ -14,13 +17,17 @@ db-down:
     fi
 
 db-connect:
-	docker exec -it postgres psql -U root -p 5432 -d postgres
+	docker exec -it postgres psql -U $(DBUSER) -p $(DBPORT) -d postgres
 
 db-migrate:
-	docker exec -it postgres psql -U root -p 5432 -d postgres -exec "CREATE DATABASE service_catalog;" -exec "\c service_catalog;" -exec "$(DATAMODEL)"
+	docker exec -it postgres psql -U $(DBUSER) -p $(DBPORT) -d postgres -exec "CREATE DATABASE $(DBNAME);"
+	goose -dir=./migrations postgres "$(DSN)" up
+
+db-reset:
+	goose -dir=./migrations postgres "$(DSN)" reset
 
 db-drop:
-	docker exec -it postgres psql -U root -p 5432 -d postgres -exec "DROP DATABASE service-catalog;"
+	docker exec -it postgres psql -U $(DBUSER) -p $(DBPORT) -d postgres -exec "DROP DATABASE $(DBNAME);"
 
 run:
 	go run app/cmd/main.go

@@ -10,6 +10,7 @@ Service Catalog API is a REST API written in Golang that can be used as a storag
 5. [viper](https://github.com/spf13/viper) to get the env variables
 6. [jwt](https://github.com/golang-jwt/jwt) for authentication
 7. [validator](https://github.com/go-playground/validator/v10) to validate incoming requests
+8. [goose](https://github.com/pressly/goose) to handler migrations
 
 ## Database schema
 
@@ -45,6 +46,7 @@ Service Catalog API is a REST API written in Golang that can be used as a storag
 There is a foreign key for `user_uuid` in the `services` table and another foreign key for `service_id` in the `service_versions` table.
 
 ## To use
+Prerequisites: Install [goose](https://github.com/pressly/goose)
 * Create a `config.yaml` file and paste the content of the `config.sample.yaml` file (Change values as per usage)
 * Create a postgres instance and run the migration file provided in the `database` directory. To make it easy, I have added command in the Makfile to do the same.
 ```bash
