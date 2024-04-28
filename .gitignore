@@ -22,3 +22,6 @@ go.work
 
 # env
 config.yaml
+
+#build file
+service-catalog-api

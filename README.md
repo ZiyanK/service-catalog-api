@@ -8,8 +8,8 @@ Service Catalog API is a REST API written in Golang that can be used as a storag
 3. [sqlx](https://github.com/jmoiron/sqlx) is used to interact with the database
 4. [zap](https://github.com/uber-go/zap) for logging
 5. [viper](https://github.com/spf13/viper) to get the env variables
-6. [jwt](github.com/golang-jwt/jwt) for authentication
-7. [validator](github.com/go-playground/validator/v10) to validate incoming requests
+6. [jwt](https://github.com/golang-jwt/jwt) for authentication
+7. [validator](https://github.com/go-playground/validator/v10) to validate incoming requests
 
 ## Database schema
 
@@ -46,7 +46,7 @@ There is a foreign key for `user_uuid` in the `services` table and another forei
 
 ## To use
 * Create a `config.yaml` file and paste the content of the `config.sample.yaml` file (Change values as per usage)
-* Create a postgres server and run the migration file provided in the `database` directory. I have written the commands to run this with docker for easy of use.
+* Create a postgres instance and run the migration file provided in the `database` directory. To make it easy, I have added command in the Makfile to do the same.
 ```bash
 make db-up
 make db-migrate
@@ -59,7 +59,7 @@ make run
 ```bash
 make test
 ```
-* If you want to build the application, you can also use
+* If you want to build the application, you can use
 ```bash
 make build
 ```

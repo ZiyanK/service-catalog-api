@@ -26,7 +26,7 @@ run:
 	go run app/cmd/main.go
 
 build:
-	go build app/cmd/main.go
+	go build -o ./service-catalog-api app/cmd/main.go
 
 test:
 	go test -v ./...

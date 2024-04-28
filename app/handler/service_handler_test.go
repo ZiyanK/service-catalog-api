@@ -21,6 +21,7 @@ func AddAuthorizationHeader(req *http.Request) error {
 	if err != nil {
 		log.Error("error parsing uuid", zap.Error(err))
 	}
+
 	claims := AuthTokenClaims{
 		UserUUID: userUUID,
 	}
@@ -28,8 +29,8 @@ func AddAuthorizationHeader(req *http.Request) error {
 	if err != nil {
 		log.Error("error generating auth token", zap.Error(err))
 	}
+
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token))
-	log.Info("token", zap.Any("t", token))
 	return nil
 }
 

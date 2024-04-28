@@ -1,13 +1,18 @@
 package main
 
 import (
-	"log"
+	"fmt"
 
 	"github.com/ZiyanK/service-catalog-api/app/db"
+	"github.com/ZiyanK/service-catalog-api/app/logger"
 	"github.com/ZiyanK/service-catalog-api/app/route"
 	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
+)
+
+var (
+	log = logger.CreateLogger()
 )
 
 func main() {
@@ -18,13 +23,17 @@ func main() {
 
 	// Databases Init
 	if err := db.InitConn(config.DSN); err != nil {
-		log.Fatal(err.Error())
+		log.Fatal("Failed to conenct to the database", zap.Error(err))
 	}
 
 	// HTTP API
 	router := route.AddRouter()
 
-	router.Run(config.Port)
+	log.Info("Server up and running")
+	err := router.Run(fmt.Sprintf(":%v", config.Port))
+	if err != nil {
+		log.Fatal("Failed to start server", zap.Error(err))
+	}
 }
 
 // configration is a struct used to get the environment variable from the config.yaml file

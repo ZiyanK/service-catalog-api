@@ -22,6 +22,7 @@ const (
 )
 
 func AddRouter() *gin.Engine {
+	gin.SetMode(gin.ReleaseMode)
 	router := gin.New()
 
 	router.GET(pathPing, func(c *gin.Context) {
