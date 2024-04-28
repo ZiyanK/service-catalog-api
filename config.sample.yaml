@@ -1,0 +1,4 @@
+dsn: postgresql://root:password@localhost:5432/service_catalog?sslmode=disable
+port: localhost:8010
+jwt_secret: secret
+mode: dev
