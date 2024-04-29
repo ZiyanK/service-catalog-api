@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/ZiyanK/service-catalog-api/app/db"
 	"github.com/ZiyanK/service-catalog-api/app/logger"
 	"github.com/ZiyanK/service-catalog-api/app/route"
+	"github.com/gin-contrib/cors"
 	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
@@ -28,6 +30,14 @@ func main() {
 
 	// HTTP API
 	router := route.AddRouter()
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:8080", "*"}, // TODO: restrict origins
+		AllowMethods:     []string{http.MethodGet, http.MethodPatch, http.MethodPost, http.MethodHead, http.MethodDelete, http.MethodOptions},
+		AllowHeaders:     []string{"Content-Type", "X-XSRF-TOKEN", "Accept", "Origin", "X-Requested-With", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+	}))
+	router.RemoveExtraSlash = true
 
 	log.Info("Server up and running")
 	err := router.Run(fmt.Sprintf(":%v", config.Port))

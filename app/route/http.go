@@ -24,6 +24,7 @@ const (
 func AddRouter() *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.New()
+	router.Use(middleware.LogRoutesMiddleware())
 
 	router.GET(pathPing, func(c *gin.Context) {
 		c.JSON(200, "pong")

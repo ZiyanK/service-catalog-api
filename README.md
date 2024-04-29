@@ -89,4 +89,4 @@ make spec-down
 ## Assumptions
 * Services can be updated but versions cannot be updated
 * A version can only be created or deleted
-* A single service cannot have multiple versions
+* A single service cannot have multiple rows of the same version
