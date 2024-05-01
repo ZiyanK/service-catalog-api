@@ -25,7 +25,7 @@ func AddAuthorizationHeader(req *http.Request) error {
 	claims := AuthTokenClaims{
 		UserUUID: userUUID,
 	}
-	token, err := GenerateAuthToken(jwtSecret, claims)
+	token, err := generateAuthToken(jwtSecret, claims)
 	if err != nil {
 		log.Error("error generating auth token", zap.Error(err))
 	}

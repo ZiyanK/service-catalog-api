@@ -14,6 +14,8 @@ import (
 const (
 	queryInsertUser = `INSERT INTO "users"(user_uuid, email, password) VALUES(:user_uuid, :email, :password) RETURNING *`
 
+	queryCheckUserExist = `SELECT count(1) FROM users WHERE email = :email`
+
 	queryGetUserByID = `
 	SELECT u.user_uuid, u.email
 	FROM "users" u
@@ -40,12 +42,64 @@ type User struct {
 
 // CreateUser is used to create a new user in the database
 func (user *User) CreateUser(ctx context.Context) error {
-	err := db.NamedExecContextReturnRow(ctx, queryInsertUser, user, user)
+	tx, err := db.Sqlx.BeginTxx(ctx, nil)
 	if err != nil {
-		log.Error("Error while creating user", zap.Error(err))
 		return err
 	}
 
+	q, args, err := sqlx.BindNamed(sqlx.BindType(db.Sqlx.DriverName()), queryCheckUserExist, map[string]interface{}{
+		"email": user.Email,
+	})
+	if err != nil {
+		log.Error("error building user fetch query", zap.Error(err))
+		tx.Rollback()
+		return err
+	}
+
+	var count int
+
+	err = tx.GetContext(ctx, &count, q, args...)
+	if err != nil && err != sql.ErrNoRows {
+		tx.Rollback()
+		log.Error("error querying user", zap.Error(err))
+		return err
+	}
+
+	if count == 1 {
+		tx.Rollback()
+		log.Info("user with mail exists")
+		return errors.New("mail exists")
+	}
+
+	// If mail doesn't exist
+	q, args, err = sqlx.BindNamed(sqlx.BindType(db.Sqlx.DriverName()), queryInsertUser, user)
+	if err != nil {
+		tx.Rollback()
+		log.Error("error building user insert query", zap.Error(err))
+		return err
+	}
+
+	result, err := tx.ExecContext(ctx, q, args...)
+	if err != nil {
+		tx.Rollback()
+		log.Error("error inserting user", zap.Error(err))
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		tx.Rollback()
+		log.Error("Error while getting no. of rows affected", zap.Error(err))
+		return err
+	}
+
+	if rowsAffected == 0 {
+		tx.Rollback()
+		log.Info("no row was updated")
+		return err
+	}
+
+	tx.Commit()
 	return nil
 }
 

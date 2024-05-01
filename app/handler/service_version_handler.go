@@ -15,7 +15,7 @@ import (
 // ServiceVersionInput is a struct used to take the version and changelog of a new version for a given service
 type ServiceVersionInput struct {
 	Version   string `json:"version" validate:"required,min=2"`
-	Changelog string `json:"changelog"`
+	Changelog string `json:"changelog"  validate:"required,min=10"`
 }
 
 // HandlerCreateServiceVersion created a new version for a given service

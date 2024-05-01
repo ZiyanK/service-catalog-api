@@ -2,8 +2,8 @@ package handler
 
 import (
 	"context"
-	"database/sql"
 	"net/http"
+	"time"
 
 	"github.com/ZiyanK/service-catalog-api/app/logger"
 	"github.com/ZiyanK/service-catalog-api/app/middleware"
@@ -42,22 +42,8 @@ func HandlerSignUp(c *gin.Context) {
 	if err != nil {
 		log.Info("validator error", zap.Error(err))
 		c.JSON(http.StatusBadRequest, gin.H{
-			"msg": "Invalid body",
+			"msg": "Invalid body.",
 		})
-		return
-	}
-
-	// check for existing email
-	user, err := model.GetUserByEmail(context.TODO(), body.Email)
-	if err != nil && err != sql.ErrNoRows {
-		log.Error("Error while fetching user by email", zap.Error(err))
-		c.Status(http.StatusInternalServerError)
-		return
-	}
-
-	if user != nil {
-		log.Info("user exists.")
-		c.Status(http.StatusBadRequest)
 		return
 	}
 
@@ -76,6 +62,12 @@ func HandlerSignUp(c *gin.Context) {
 
 	err = createUserObj.CreateUser(context.TODO())
 	if err != nil {
+		if err.Error() == "mail exists" {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"msg": "Try using a different email.",
+			})
+			return
+		}
 		c.Status(http.StatusInternalServerError)
 		return
 	}
@@ -85,17 +77,19 @@ func HandlerSignUp(c *gin.Context) {
 	}
 
 	jwtSecret := viper.Get("jwt_secret").(string)
-	token, err := GenerateAuthToken(jwtSecret, claims)
+	token, err := generateAuthToken(jwtSecret, claims)
 	if err != nil {
 		c.Status(http.StatusInternalServerError)
 		return
 	}
 
 	respData := struct {
-		model.User
-		AccessToken string `json:"access_token"`
+		Email       string    `json:"email"`
+		CreatedAt   time.Time `json:"created_at"`
+		AccessToken string    `json:"access_token"`
 	}{
-		User:        *createUserObj,
+		Email:       createUserObj.Email,
+		CreatedAt:   createUserObj.CreatedAt,
 		AccessToken: token,
 	}
 
@@ -155,7 +149,7 @@ func HandlerLogin(c *gin.Context) {
 	}
 
 	jwtSecret := viper.Get("jwt_secret").(string)
-	token, err := GenerateAuthToken(jwtSecret, claims)
+	token, err := generateAuthToken(jwtSecret, claims)
 	if err != nil {
 		c.Status(http.StatusInternalServerError)
 		return
@@ -174,7 +168,7 @@ type AuthTokenClaims struct {
 }
 
 // GenerateAuthToken generates auth token for a given secret
-func GenerateAuthToken(secret string, claimsToAdd AuthTokenClaims) (string, error) {
+func generateAuthToken(secret string, claimsToAdd AuthTokenClaims) (string, error) {
 	var secretKeyInBytes = []byte(secret)
 
 	token := jwt.New(jwt.SigningMethodHS256)

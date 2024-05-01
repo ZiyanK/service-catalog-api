@@ -32,14 +32,18 @@ func HandlerCreateService(c *gin.Context) {
 	err = c.ShouldBindJSON(&body)
 	if err != nil {
 		log.Error("Error while reading request body for signup", zap.Error(err))
-		c.Status(http.StatusUnprocessableEntity)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"msg": "Invalid body.",
+		})
 		return
 	}
 
 	err = validator.New().Struct(body)
 	if err != nil {
 		log.Info("validator error", zap.Error(err))
-		c.Status(http.StatusUnprocessableEntity)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"msg": "Invalid body.",
+		})
 		return
 	}
 
@@ -98,9 +102,7 @@ func HandlerGetServices(c *gin.Context) {
 	services, err := model.GetServices(context.TODO(), userUUID, limit, offset, name, orderBy)
 	if err != nil {
 		log.Error("Error while fetching services", zap.Error(err))
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"msg": "Error fetching services.",
-		})
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 

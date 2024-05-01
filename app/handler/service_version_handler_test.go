@@ -19,7 +19,7 @@ func TestHandlerCreateServiceVersion(t *testing.T) {
 	router.POST(route, HandlerCreateServiceVersion)
 	svBody := ServiceVersionInput{
 		Version:   "v1.0.0",
-		Changelog: "init",
+		Changelog: "this is the changelog",
 	}
 	jsonValue, _ := json.Marshal(svBody)
 

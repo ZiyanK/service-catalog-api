@@ -22,9 +22,8 @@ func HandlerGetUser(c *gin.Context) {
 	user, err := model.GetUserByID(context.TODO(), userUUID)
 	if err != nil {
 		log.Error("Error fetching user info", zap.Error(err))
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"msg": "Error fetching user info.",
-		})
+		c.Status(http.StatusInternalServerError)
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{

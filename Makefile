@@ -24,7 +24,7 @@ db-migrate:
 	goose -dir=./migrations postgres "$(DSN)" up
 
 db-reset:
-	goose -dir=./migrations postgres "$(DSN)" reset
+	docker exec -it postgres psql -U $(DBUSER) -p $(DBPORT) -d postgres -exec "DROP DATABASE $(DBNAME);"
 
 db-drop:
 	docker exec -it postgres psql -U $(DBUSER) -p $(DBPORT) -d postgres -exec "DROP DATABASE $(DBNAME);"
