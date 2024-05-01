@@ -40,11 +40,11 @@ func SetupTest() *gin.Engine {
 		log.Fatal("unable to decode into struct", zap.String("err", err.Error()))
 	}
 
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 	if err := db.InitConn(config.DSN); err != nil {
 		log.Fatal("Error connecting to db: ", zap.Error(err))
 	}
-	gin.SetMode(gin.ReleaseMode)
 	return r
 }
 

@@ -6,6 +6,8 @@ import (
 	"testing"
 )
 
+// Test query indexes
+
 // TestQueryGetServiceByNameAndUserUUID is used to test whether the index is used to query the service by it's name and user uuid
 func TestQueryGetServiceByNameAndUserUUID(t *testing.T) {
 	setupTest()
