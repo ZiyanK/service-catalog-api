@@ -7,6 +7,7 @@ import (
 	"github.com/ZiyanK/service-catalog-api/app/middleware"
 	"github.com/ZiyanK/service-catalog-api/app/model"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"go.uber.org/zap"
 )
 
@@ -49,7 +50,18 @@ func HandlerUpdateUser(c *gin.Context) {
 	err = c.ShouldBindJSON(&body)
 	if err != nil {
 		log.Error("Error while reading request body for signup", zap.Error(err))
-		c.Status(http.StatusUnprocessableEntity)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"msg": "Invalid body",
+		})
+		return
+	}
+
+	err = validator.New().Struct(body)
+	if err != nil {
+		log.Info("validator error", zap.Error(err))
+		c.JSON(http.StatusBadRequest, gin.H{
+			"msg": "Invalid body",
+		})
 		return
 	}
 

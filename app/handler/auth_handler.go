@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"database/sql"
 	"net/http"
 	"time"
 
@@ -34,7 +35,9 @@ func HandlerSignUp(c *gin.Context) {
 	err := c.ShouldBindJSON(&body)
 	if err != nil {
 		log.Error("Error while reading request body for signup", zap.Error(err))
-		c.Status(http.StatusUnprocessableEntity)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"msg": "Invalid body.",
+		})
 		return
 	}
 
@@ -106,10 +109,13 @@ func HandlerLogin(c *gin.Context) {
 	err := c.ShouldBindJSON(&body)
 	if err != nil {
 		log.Info("Error while reading request body for login", zap.Error(err))
-		c.Status(http.StatusUnprocessableEntity)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"msg": "Invalid body",
+		})
 		return
 	}
 
+	// Validate request body
 	err = validator.New().Struct(body)
 	if err != nil {
 		log.Info("validator error", zap.Error(err))
@@ -119,26 +125,25 @@ func HandlerLogin(c *gin.Context) {
 		return
 	}
 
+	// Check if user exists
 	user, err := model.GetUserByEmail(context.TODO(), body.Email)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"msg": "Invalid email or password. Please try again.",
+			})
+			return
+		}
 		log.Error("Error when fetching user by email", zap.Error(err))
 		c.Status(http.StatusInternalServerError)
 		return
 	}
-	// check if user found with email
-	if user == nil {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"msg": "Invalid email or password. Please try again.",
-		})
-		return
 
-	}
-
-	// check if password matches
+	// Check if password matches
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Password))
 	if err != nil {
 		log.Info("Password does not match")
-		c.JSON(http.StatusUnauthorized, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"msg": "Invalid email or password. Please try again.",
 		})
 		return
@@ -148,6 +153,7 @@ func HandlerLogin(c *gin.Context) {
 		UserUUID: user.UserUUID,
 	}
 
+	// Generate auth token for user
 	jwtSecret := viper.Get("jwt_secret").(string)
 	token, err := generateAuthToken(jwtSecret, claims)
 	if err != nil {

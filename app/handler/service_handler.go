@@ -38,6 +38,7 @@ func HandlerCreateService(c *gin.Context) {
 		return
 	}
 
+	// Validate request body
 	err = validator.New().Struct(body)
 	if err != nil {
 		log.Info("validator error", zap.Error(err))
@@ -53,6 +54,7 @@ func HandlerCreateService(c *gin.Context) {
 		UserUUID:    userUUID,
 	}
 
+	// Create new service for user
 	err = service.CreateService(context.TODO())
 	if err != nil {
 		if err.Error() == "service exists" {
@@ -176,14 +178,18 @@ func HandlerUpdateService(c *gin.Context) {
 	err = c.ShouldBindJSON(&body)
 	if err != nil {
 		log.Error("Error while reading request body for signup", zap.Error(err))
-		c.Status(http.StatusUnprocessableEntity)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"msg": "Invalid body.",
+		})
 		return
 	}
 
 	err = validator.New().Struct(body)
 	if err != nil {
 		log.Info("validator error", zap.Error(err))
-		c.Status(http.StatusUnprocessableEntity)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"msg": "Invalid body.",
+		})
 		return
 	}
 

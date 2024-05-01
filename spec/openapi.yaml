@@ -59,8 +59,6 @@ paths:
                     examples:
                     - Try using a different email.
                     - Invalid body.
-        '422':
-          description: Unprocessable entity
         '500':
           description: Failed operation
   /login:
@@ -110,8 +108,6 @@ paths:
                   msg:
                     type: string
                     example: Invalid email or password. Please try again
-        '422':
-          description: Unprocessable entity
         '500':
           description: Failed operation
   /user:
@@ -171,11 +167,11 @@ paths:
                 properties:
                   msg:
                     type: string
-                    example: User with this mail already exists.
+                    examples:
+                    - User with this mail already exists.
+                    - Invalid body.
         '401':
           description: Unauthorized
-        '422':
-          description: Unprocessable Entity
         '500':
           description: Failed operation
   /services:
@@ -350,8 +346,6 @@ paths:
           description: Unauthorized
         '404':
           description: Not found
-        '422':
-          description: Unprocessable Entity
         '500':
           description: Failed operation
     delete:
@@ -412,13 +406,13 @@ paths:
                 properties:
                   msg:
                     type: string
-                    example: Service with same version exists.
+                    examples:
+                    - Service with same version exists.
+                    - Invalid body.
         '401':
           description: Unauthorized
         '404':
           description: Not found
-        '422':
-          description: Unprocessable Entity
         '500':
           description: Failed operation
   /service/{id}/version/{vid}:

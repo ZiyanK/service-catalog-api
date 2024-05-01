@@ -40,14 +40,18 @@ func HandlerCreateServiceVersion(c *gin.Context) {
 	err = c.ShouldBindJSON(&body)
 	if err != nil {
 		log.Error("Error while reading request body for signup", zap.Error(err))
-		c.Status(http.StatusUnprocessableEntity)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"msg": "Invalid body.",
+		})
 		return
 	}
 
 	err = validator.New().Struct(body)
 	if err != nil {
 		log.Info("validator error", zap.Error(err))
-		c.Status(http.StatusUnprocessableEntity)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"msg": "Invalid body.",
+		})
 		return
 	}
 
