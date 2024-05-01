@@ -12,13 +12,13 @@ import (
 )
 
 const (
-	queryInsertUser = `INSERT INTO "users"(user_uuid, email, password) VALUES(:user_uuid, :email, :password) RETURNING *`
+	queryInsertUser = `INSERT INTO users(user_uuid, email, password) VALUES(:user_uuid, :email, :password) RETURNING *`
 
 	queryCheckUserExist = `SELECT count(1) FROM users WHERE email = :email`
 
 	queryGetUserByID = `
 	SELECT u.user_uuid, u.email
-	FROM "users" u
+	FROM users u
 	WHERE u.user_uuid = :user_uuid`
 
 	queryGetUserByEmail = `
@@ -27,7 +27,7 @@ const (
 	WHERE email = :email`
 
 	queryUpdateUserByID = `
-	UPDATE "users" SET email = :email, updated_at = NOW()
+	UPDATE users SET email = :email, updated_at = NOW()
 	WHERE user_uuid = :user_uuid`
 )
 

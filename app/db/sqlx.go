@@ -5,7 +5,6 @@ import (
 	"database/sql"
 
 	"github.com/jmoiron/sqlx"
-	"go.uber.org/zap"
 )
 
 // NamedSelectContext is used to fetch multiple rows from the database
@@ -55,7 +54,15 @@ func (d *Database) NamedExecContextReturnRow(ctx context.Context, query string, 
 		return err
 	}
 
-	log.Info("q", zap.Any("q", q), zap.Any("args", args))
-
 	return d.Sqlx.QueryRowx(q, args...).StructScan(obj)
+}
+
+// NamedExplainQuery is used analye the query execution
+func (d *Database) NamedExplainQuery(ctx context.Context, query string, arg interface{}) (*sqlx.Rows, error) {
+	q, args, err := sqlx.BindNamed(sqlx.BindType(d.Sqlx.DriverName()), query, arg)
+	if err != nil {
+		return &sqlx.Rows{}, err
+	}
+
+	return d.Sqlx.Queryx(q, args...)
 }

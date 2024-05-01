@@ -55,7 +55,7 @@ func (sv *ServiceVersion) CreateServiceVersion(ctx context.Context, userUUID uui
 	}
 
 	// Check if service exists
-	q, args, err := sqlx.BindNamed(sqlx.BindType(db.Sqlx.DriverName()), queryGetServiceByIDAndUserUUID, map[string]interface{}{
+	q, args, err := sqlx.BindNamed(sqlx.BindType(db.Sqlx.DriverName()), queryCheckServiceByIDAndUserUUID, map[string]interface{}{
 		"service_id": sv.ServiceID,
 		"user_uuid":  userUUID,
 	})

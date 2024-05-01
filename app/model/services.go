@@ -15,11 +15,11 @@ import (
 const (
 	queryInsertService = `INSERT INTO services(name, description, user_uuid) VALUES(:name, :description, :user_uuid)`
 
-	queryGetServiceByNameAndUserUUID = `
+	queryCheckServiceByNameAndUserUUID = `
 	SELECT COUNT(1) FROM services s
 	WHERE s.name = :name AND s.user_uuid = :user_uuid`
 
-	queryGetServiceByIDAndUserUUID = `
+	queryCheckServiceByIDAndUserUUID = `
 	SELECT COUNT(1) FROM services s
 	WHERE s.service_id = :service_id AND s.user_uuid = :user_uuid`
 
@@ -66,7 +66,7 @@ func (service *Service) CreateService(ctx context.Context) error {
 		return err
 	}
 
-	q, args, err := sqlx.BindNamed(sqlx.BindType(db.Sqlx.DriverName()), queryGetServiceByNameAndUserUUID, map[string]interface{}{
+	q, args, err := sqlx.BindNamed(sqlx.BindType(db.Sqlx.DriverName()), queryCheckServiceByNameAndUserUUID, map[string]interface{}{
 		"name":      service.Name,
 		"user_uuid": service.UserUUID,
 	})
@@ -198,7 +198,7 @@ func (service *Service) UpdateService(ctx context.Context) error {
 		return err
 	}
 
-	q, args, err := sqlx.BindNamed(sqlx.BindType(db.Sqlx.DriverName()), queryGetServiceByIDAndUserUUID, map[string]interface{}{
+	q, args, err := sqlx.BindNamed(sqlx.BindType(db.Sqlx.DriverName()), queryCheckServiceByIDAndUserUUID, map[string]interface{}{
 		"service_id": service.ServiceID,
 		"user_uuid":  service.UserUUID,
 	})
@@ -258,7 +258,7 @@ func (service *Service) DeleteService(ctx context.Context) error {
 		return err
 	}
 
-	q, args, err := sqlx.BindNamed(sqlx.BindType(db.Sqlx.DriverName()), queryGetServiceByIDAndUserUUID, map[string]interface{}{
+	q, args, err := sqlx.BindNamed(sqlx.BindType(db.Sqlx.DriverName()), queryCheckServiceByIDAndUserUUID, map[string]interface{}{
 		"service_id": service.ServiceID,
 		"user_uuid":  service.UserUUID,
 	})

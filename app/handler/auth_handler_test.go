@@ -23,15 +23,11 @@ type configuration struct {
 }
 
 var (
-	Config   configuration
+	config   configuration
 	UserUUID uuid.UUID
 )
 
 func SetupTest() *gin.Engine {
-	r := gin.New()
-	if err := db.InitConn("postgresql://root:password@localhost:5432/service_catalog?sslmode=disable"); err != nil {
-		log.Fatal("Error connecting to db: ", zap.Error(err))
-	}
 	viper.AddConfigPath("../..")
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
@@ -40,9 +36,15 @@ func SetupTest() *gin.Engine {
 		log.Fatal("Error reading config file", zap.String("err", err.Error()))
 	}
 
-	if err := viper.Unmarshal(&Config); err != nil {
+	if err := viper.Unmarshal(&config); err != nil {
 		log.Fatal("unable to decode into struct", zap.String("err", err.Error()))
 	}
+
+	r := gin.New()
+	if err := db.InitConn(config.DSN); err != nil {
+		log.Fatal("Error connecting to db: ", zap.Error(err))
+	}
+	gin.SetMode(gin.ReleaseMode)
 	return r
 }
 
