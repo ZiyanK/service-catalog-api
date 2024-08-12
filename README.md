@@ -11,6 +11,7 @@ Service Catalog API is a REST API written in Golang that can be used as a storag
 6. [jwt](https://github.com/golang-jwt/jwt) for authentication
 7. [validator](https://github.com/go-playground/validator/v10) to validate incoming requests
 8. [goose](https://github.com/pressly/goose) to handler migrations
+9. Docker and Kubernetes for easy deployment
 
 ## Database schema
 

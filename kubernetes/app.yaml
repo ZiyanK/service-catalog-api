@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-catalog
+spec:
+  selector:
+    matchLabels:
+      app: service-catalog
+  template:
+    metadata:
+      labels:
+        app: service-catalog
+    spec:
+      containers:
+      - name: service-catalog
+        image: service-catalog:latest
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8080
+        env:
+        - name: DSN
+          valueFrom:
+            secretKeyRef:
+              name: service-catalog-secret
+              key: dsn
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: service-catalog-secret
+              key: jwt-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-catalog-service
+spec:
+  selector:
+    app: service-catalog
+  type: LoadBalancer
+  ports:
+  - port: 8080
+    targetPort: 8080
+    nodePort: 30000

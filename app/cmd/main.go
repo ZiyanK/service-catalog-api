@@ -48,10 +48,9 @@ func main() {
 
 // configration is a struct used to get the environment variable from the config.yaml file
 type configuration struct {
-	DSN       string `mapstructure:"dsn"`
-	Port      string `mapstructure:"port"`
-	JWTSecret string `mapstructure:"jwt_secret"`
-	Mode      string `mapstructure:"mode"`
+	DSN       string `mapstructure:"DSN"`
+	Port      string `mapstructure:"PORT"`
+	JWTSecret string `mapstructure:"JWT_SECRET"`
 }
 
 var (
@@ -61,17 +60,27 @@ var (
 // LoadConfig is used to load the configuration
 func LoadConfig() error {
 	viper.AddConfigPath(".")
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
+	viper.SetConfigFile(".env")
+	viper.SetConfigType("env")
 
-	if err := viper.ReadInConfig(); err != nil {
-		log.Fatal("Error reading config file", zap.String("err", err.Error()))
-		return err
-	}
+	err := viper.ReadInConfig()
+	if err != nil {
+		viper.AutomaticEnv()
 
-	if err := viper.Unmarshal(&config); err != nil {
-		log.Fatal("unable to decode into struct", zap.String("err", err.Error()))
-		return err
+		dsn := viper.GetString("DSN")
+		jwtSecret := viper.GetString("JWT_SECRET")
+		port := viper.GetString("PORT")
+
+		log.Info("config", zap.Any("DSN", dsn))
+
+		config.DSN = dsn
+		config.JWTSecret = jwtSecret
+		config.Port = port
+	} else {
+		if err := viper.Unmarshal(&config); err != nil {
+			log.Fatal("unable to decode into struct", zap.String("err", err.Error()))
+			return err
+		}
 	}
 
 	return nil

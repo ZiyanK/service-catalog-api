@@ -19,7 +19,6 @@ type configuration struct {
 	DSN       string `mapstructure:"dsn"`
 	Port      string `mapstructure:"port"`
 	JWTSecret string `mapstructure:"jwt_secret"`
-	Mode      string `mapstructure:"mode"`
 }
 
 var (

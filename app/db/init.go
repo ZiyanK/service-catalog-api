@@ -19,7 +19,7 @@ type Database struct {
 func InitConn(dsn string) error {
 	db, err := sqlx.Connect("postgres", dsn)
 	if err != nil {
-		log.Fatal("")
+		log.Fatal(err.Error())
 		return err
 	}
 
